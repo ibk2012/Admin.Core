@@ -46,9 +46,9 @@ namespace Admin.Core.Db
             #endregion
 
             var fsql = freeSqlBuilder.Build();
-
+            //fsql.GlobalFilter.Apply<IEntitySoftDelete>("SoftDelete", a => a.IsDeleted == false);
             services.AddFreeRepository(filter => filter.Apply<IEntitySoftDelete>("SoftDelete", a => a.IsDeleted == false));
-            services.AddScoped<IUnitOfWork>(sp => fsql.CreateUnitOfWork());
+            services.AddScoped<UnitOfWorkManager>();
             services.AddSingleton(fsql);
 
             #region 初始化数据库
@@ -76,7 +76,10 @@ namespace Admin.Core.Db
             {
                 fsql.Aop.CurdBefore += (s, e) =>
                 {
-                    Console.WriteLine($"{e.Sql}\r\n");
+                    System.Threading.Tasks.Parallel.For(0, 1, body =>
+                    {
+                        Console.WriteLine($"{e.Sql}\r\n");
+                    });
                 };
             }
             #endregion

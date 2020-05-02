@@ -79,7 +79,9 @@ namespace Admin.Core.Db
                 typeof(UserRoleEntity),
                 typeof(RolePermissionEntity),
                 typeof(OprationLogEntity),
-                typeof(LoginLogEntity)
+                typeof(LoginLogEntity),
+                typeof(DocumentEntity),
+                typeof(DocumentImageEntity)
             });
             Console.WriteLine($"{(msg.NotNull() ? msg : $"sync {dbType} structure")} succeed\r\n");
         }
@@ -193,14 +195,14 @@ namespace Admin.Core.Db
                 Console.WriteLine("\r\nsync data started");
 
                 db.Aop.AuditValue += SyncDataAuditValue;
-
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), @"Db\Data\data.json");
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Db/Data/data.json").ToPath();
                 var jsonData = FileHelper.ReadFile(filePath);
                 var data = JsonConvert.DeserializeObject<Data>(jsonData);
 
                 using (var uow = db.CreateUnitOfWork())
                 using (var tran = uow.GetOrBeginTransaction())
                 {
+                    await InitDtData(db, data.Documents, tran, dbConfig);
                     await InitDtData(db, data.Dictionaries, tran, dbConfig);
                     await InitDtData(db, data.Apis, tran, dbConfig);
                     await InitDtData(db, data.Views, tran, dbConfig);
@@ -302,7 +304,6 @@ namespace Admin.Core.Db
                     a.Id,
                     a.UserName,
                     a.Password,
-                    a.Name,
                     a.NickName,
                     a.Avatar,
                     a.Status,
@@ -364,7 +365,7 @@ namespace Admin.Core.Db
                 //Formatting.Indented, 
                 settings
                 );
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), @"Db\Data\data.json");
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Db/Data/data.json").ToPath();
                 FileHelper.WriteFile(filePath, jsonData);
                 #endregion
 

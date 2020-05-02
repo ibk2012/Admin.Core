@@ -1,6 +1,5 @@
 using System;
 using FreeSql.DataAnnotations;
-using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 
 namespace Admin.Core.Model.Admin
@@ -15,13 +14,13 @@ namespace Admin.Core.Model.Admin
         /// <summary>
         /// 名称
         /// </summary>
-        [MaxLength(50)]
+        [Column(StringLength = 50)]
         public string Name { get; set; }
 
         /// <summary>
         /// 说明
         /// </summary>
-        [Column(DbType = "varchar(100)")]
+        [Column(StringLength = 200)]
 		public string Description { get; set; }
 
         /// <summary>

@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Admin.Core.Common.Helpers;
 using Admin.Core.Db;
+using Admin.Core.Common.Attributes;
 
 namespace Admin.Core.Logs
 {
     /// <summary>
     /// Api帮助类
     /// </summary>
+    [SingleInstance]
     public class ApiHelper
     {
         private List<ApiHelperDto> _apis;
@@ -26,7 +28,7 @@ namespace Admin.Core.Logs
                     return _apis;
 
                 _apis = new List<ApiHelperDto>();
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), @"Db\Data\data.json");
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Db/Data/data.json").ToPath();
                 var jsonData = FileHelper.ReadFile(filePath);
                 var apis = JsonConvert.DeserializeObject<Data>(jsonData).Apis;
                 foreach (var api in apis)

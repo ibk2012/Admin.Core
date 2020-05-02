@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Data;
+using FreeSql;
 
-namespace Admin.Core.Common
+namespace Admin.Core.Common.Attributes
 {
     /// <summary>
     /// 启用事物
@@ -8,6 +10,14 @@ namespace Admin.Core.Common
     [AttributeUsage(AttributeTargets.Method, Inherited = true)]
     public class TransactionAttribute : Attribute
     {
+        /// <summary>
+        /// 事务传播方式
+        /// </summary>
+        public Propagation Propagation { get; set; } = Propagation.Requierd;
 
+        /// <summary>
+        /// 事务隔离级别
+        /// </summary>
+        public IsolationLevel? IsolationLevel { get; set; }
     }
 }

@@ -79,7 +79,7 @@
             <param name="key"></param>
             <returns></returns>
         </member>
-        <member name="M:Admin.Core.Controllers.Admin.ApiController.GetPage(Admin.Core.Model.Input.PageInput{Admin.Core.Model.Admin.ApiEntity})">
+        <member name="M:Admin.Core.Controllers.Admin.ApiController.GetPage(Admin.Core.Common.Input.PageInput{Admin.Core.Model.Admin.ApiEntity})">
             <summary>
             查询分页接口
             </summary>
@@ -190,7 +190,7 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:Admin.Core.Controllers.Admin.DictionaryController.GetPage(Admin.Core.Model.Input.PageInput{Admin.Core.Model.Admin.DictionaryEntity})">
+        <member name="M:Admin.Core.Controllers.Admin.DictionaryController.GetPage(Admin.Core.Common.Input.PageInput{Admin.Core.Model.Admin.DictionaryEntity})">
             <summary>
             查询分页数据字典
             </summary>
@@ -218,33 +218,113 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="T:Admin.Core.Controllers.Admin.DocumentController">
+            <summary>
+            文档管理
+            </summary>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.DocumentController.GetList(System.String,System.Nullable{System.DateTime},System.Nullable{System.DateTime})">
+            <summary>
+            查询文档列表
+            </summary>
+            <param name="key"></param>
+            <param name="start"></param>
+            <param name="end"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.DocumentController.GetImageList(System.Int64)">
+            <summary>
+            查询文档图片列表
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.DocumentController.GetGroup(System.Int64)">
+            <summary>
+            查询单条分组
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.DocumentController.GetMenu(System.Int64)">
+            <summary>
+            查询单条菜单
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.DocumentController.GetContent(System.Int64)">
+            <summary>
+            查询单条文档内容
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.DocumentController.GetPlainList">
+            <summary>
+            查询精简文档列表
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.DocumentController.AddGroup(Admin.Core.Service.Admin.Document.Input.DocumentAddGroupInput)">
+            <summary>
+            新增分组
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.DocumentController.AddMenu(Admin.Core.Service.Admin.Document.Input.DocumentAddMenuInput)">
+            <summary>
+            新增菜单
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.DocumentController.UpdateGroup(Admin.Core.Service.Admin.Document.Input.DocumentUpdateGroupInput)">
+            <summary>
+            修改分组
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.DocumentController.UpdateMenu(Admin.Core.Service.Admin.Document.Input.DocumentUpdateMenuInput)">
+            <summary>
+            修改菜单
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.DocumentController.UpdateContent(Admin.Core.Service.Admin.Document.Input.DocumentUpdateContentInput)">
+            <summary>
+            修改文档内容
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.DocumentController.SoftDelete(System.Int64)">
+            <summary>
+            删除文档
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.DocumentController.UploadImage(Admin.Core.Service.Admin.Document.Input.DocumentUploadImageInput)">
+            <summary>
+            上传文档图片
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
         <member name="T:Admin.Core.Controllers.Admin.ImgController">
             <summary>
             图片管理
             </summary>
         </member>
-        <member name="M:Admin.Core.Controllers.Admin.ImgController.Avatar(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,System.String)">
+        <member name="M:Admin.Core.Controllers.Admin.ImgController.AvatarUpload(Microsoft.AspNetCore.Http.IFormFile)">
             <summary>
-            获取头像
+            上传头像
             </summary>
-            <param name="environment"></param>
-            <param name="fileName"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Admin.Core.Controllers.Admin.ImgController.Download(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,System.String)">
-            <summary>
-            下载图片
-            </summary>
-            <param name="environment"></param>
-            <param name="fileName"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Admin.Core.Controllers.Admin.ImgController.Upload(Microsoft.AspNetCore.Hosting.IWebHostEnvironment)">
-            <summary>
-            上传图片
-            支持多图片上传
-            </summary>
-            <param name="environment"></param>
+            <param name="file"></param>
             <returns></returns>
         </member>
         <member name="T:Admin.Core.Controllers.Admin.LoginLogController">
@@ -252,7 +332,7 @@
             登录日志管理
             </summary>
         </member>
-        <member name="M:Admin.Core.Controllers.Admin.LoginLogController.GetPage(Admin.Core.Model.Input.PageInput{Admin.Core.Model.Admin.LoginLogEntity})">
+        <member name="M:Admin.Core.Controllers.Admin.LoginLogController.GetPage(Admin.Core.Common.Input.PageInput{Admin.Core.Model.Admin.LoginLogEntity})">
             <summary>
             查询分页登录日志
             </summary>
@@ -264,7 +344,7 @@
             操作日志管理
             </summary>
         </member>
-        <member name="M:Admin.Core.Controllers.Admin.OprationLogController.GetPage(Admin.Core.Model.Input.PageInput{Admin.Core.Model.Admin.OprationLogEntity})">
+        <member name="M:Admin.Core.Controllers.Admin.OprationLogController.GetPage(Admin.Core.Common.Input.PageInput{Admin.Core.Model.Admin.OprationLogEntity})">
             <summary>
             查询分页操作日志
             </summary>
@@ -387,7 +467,7 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:Admin.Core.Controllers.Admin.RoleController.GetPage(Admin.Core.Model.Input.PageInput{Admin.Core.Model.Admin.RoleEntity})">
+        <member name="M:Admin.Core.Controllers.Admin.RoleController.GetPage(Admin.Core.Common.Input.PageInput{Admin.Core.Model.Admin.RoleEntity})">
             <summary>
             查询分页角色
             </summary>
@@ -440,7 +520,7 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:Admin.Core.Controllers.Admin.UserController.GetPage(Admin.Core.Model.Input.PageInput{Admin.Core.Model.Admin.UserEntity})">
+        <member name="M:Admin.Core.Controllers.Admin.UserController.GetPage(Admin.Core.Common.Input.PageInput{Admin.Core.Model.Admin.UserEntity})">
             <summary>
             查询分页用户
             </summary>
@@ -508,7 +588,7 @@
             <param name="key"></param>
             <returns></returns>
         </member>
-        <member name="M:Admin.Core.Controllers.Admin.ViewController.GetPage(Admin.Core.Model.Input.PageInput{Admin.Core.Model.Admin.ViewEntity})">
+        <member name="M:Admin.Core.Controllers.Admin.ViewController.GetPage(Admin.Core.Common.Input.PageInput{Admin.Core.Model.Admin.ViewEntity})">
             <summary>
             查询分页视图
             </summary>

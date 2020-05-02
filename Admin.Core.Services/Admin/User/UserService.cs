@@ -2,17 +2,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using AutoMapper;
-using Admin.Core.Common;
 using Admin.Core.Common.Helpers;
 using Admin.Core.Common.Auth;
 using Admin.Core.Common.Cache;
-using Admin.Core.Model.Input;
-using Admin.Core.Model.Output;
+using Admin.Core.Common.Input;
+using Admin.Core.Common.Output;
 using Admin.Core.Model.Admin;
 using Admin.Core.Repository.Admin;
 using Admin.Core.Service.Admin.User;
 using Admin.Core.Service.Admin.User.Input;
 using Admin.Core.Service.Admin.User.Output;
+using Admin.Core.Common.Attributes;
 
 namespace Admin.Core.FrameWork.Service.User
 {
@@ -60,10 +60,10 @@ namespace Admin.Core.FrameWork.Service.User
 
         public async Task<IResponseOutput> PageAsync(PageInput<UserEntity> input)
         {
-            var key = input.Filter?.Name;
+            var key = input.Filter?.UserName;
 
             var list = await _userRepository.Select
-            .WhereIf(key.NotNull(), a => a.Status >= 0 && (a.UserName.Contains(key) || a.NickName.Contains(key) || a.Name.Contains(key)))
+            .WhereIf(key.NotNull(), a => a.Status >= 0 && (a.UserName.Contains(key) || a.NickName.Contains(key)))
             .Count(out var total)
             .OrderByDescending(true, a => a.Id)
             .IncludeMany(a => a.Roles.Select(b => new RoleEntity{ Name = b.Name }))
@@ -96,7 +96,7 @@ namespace Admin.Core.FrameWork.Service.User
             {
                 return ResponseOutput.NotOk();
             }
-          
+
             if (input.RoleIds != null && input.RoleIds.Any())
             {
                 var roles = input.RoleIds.Select(d => new UserRoleEntity(user.Id, d));
@@ -122,7 +122,7 @@ namespace Admin.Core.FrameWork.Service.User
 
             _mapper.Map(input, entity);
             await _userRepository.UpdateAsync(entity);
-            await _userRoleRepository.Where(m => m.UserId == entity.Id).ToDelete().ExecuteAffrowsAsync();
+            await _userRoleRepository.DeleteAsync(a => a.UserId == entity.Id);
             if (input.RoleIds != null && input.RoleIds.Any())
             {
                 var roles = input.RoleIds.Select(d => new UserRoleEntity(entity.Id, d));

@@ -3,7 +3,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Admin.Core.Attributes;
-using Admin.Core.Model.Output;
+using Admin.Core.Common.Output;
 using Admin.Core.Service.Admin.Auth;
 using Admin.Core.Service.Admin.Auth.Input;
 using Admin.Core.Service.Admin.Auth.Output;
@@ -100,7 +100,7 @@ namespace Admin.Core.Controllers.Admin
             {
                 user = (res as IResponseOutput<AuthLoginOutput>).Data;
                 loginLogAddInput.CreatedUserId = user.Id;
-                loginLogAddInput.RealName = user.Name;
+                loginLogAddInput.NickName = user.NickName;
             }
 
             await _loginLogService.AddAsync(loginLogAddInput);
@@ -116,7 +116,7 @@ namespace Admin.Core.Controllers.Admin
             {
                 new Claim(ClaimAttributes.UserId, user.Id.ToString()),
                 new Claim(ClaimAttributes.UserName, user.UserName),
-                new Claim(ClaimAttributes.UserRealName, user.Name)
+                new Claim(ClaimAttributes.UserNickName, user.NickName)
             }); 
             #endregion
 

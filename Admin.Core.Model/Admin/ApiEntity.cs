@@ -1,6 +1,5 @@
 using System;
 using FreeSql.DataAnnotations;
-using System.ComponentModel.DataAnnotations;
 
 namespace Admin.Core.Model.Admin
 {
@@ -19,31 +18,31 @@ namespace Admin.Core.Model.Admin
         /// <summary>
         /// 接口命名
         /// </summary>
-        [MaxLength(50)]
+        [Column(StringLength = 50)]
         public string Name { get; set; }
 
         /// <summary>
         /// 接口名称
         /// </summary>
-        [MaxLength(500)]
+        [Column(StringLength = 500)]
         public string Label { get; set; }
 
         /// <summary>
         /// 接口地址
         /// </summary>
-        [MaxLength(500)]
+        [Column(StringLength = 500)]
         public string Path { get; set; }
 
         /// <summary>
         /// 接口提交方法
         /// </summary>
-        [MaxLength(50)]
+        [Column(StringLength = 50)]
         public string HttpMethods { get; set; }
 
         /// <summary>
         /// 说明
         /// </summary>
-        [MaxLength(500)]
+        [Column(StringLength = 500)]
         public string Description { get; set; }
 
         /// <summary>

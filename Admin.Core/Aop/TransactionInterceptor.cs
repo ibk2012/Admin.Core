@@ -2,37 +2,52 @@
 using System.Threading.Tasks;
 using Castle.DynamicProxy;
 using FreeSql;
-using Admin.Core.Common;
-using Admin.Core.Extensions;
-using Admin.Core.Model.Output;
-
+using Admin.Core.Common.Extensions;
+using Admin.Core.Common.Output;
+using Admin.Core.Common.Attributes;
 
 namespace Admin.Core.Aop
 {
     public class TransactionInterceptor : IInterceptor
     {
-        private readonly IUnitOfWork _unitOfWork;
-        public TransactionInterceptor(IUnitOfWork unitOfWork)
+        IUnitOfWork _unitOfWork;
+        private readonly UnitOfWorkManager _unitOfWorkManager;
+        
+        public TransactionInterceptor(UnitOfWorkManager unitOfWorkManager)
         {
-            _unitOfWork = unitOfWork;
+            _unitOfWorkManager = unitOfWorkManager;
         }
 
         public async void Intercept(IInvocation invocation)
         {
             var method = invocation.MethodInvocationTarget ?? invocation.Method;
+            
             if (method.HasAttribute<TransactionAttribute>())
             {
                 try
                 {
-                    _unitOfWork.Open();
+                    var transaction = method.GetAttribute<TransactionAttribute>();
+                    _unitOfWork = _unitOfWorkManager.Begin(transaction.Propagation, transaction.IsolationLevel);
                     invocation.Proceed();
 
                     if (method.IsAsync())
                     {
                         if (invocation.Method.ReturnType == typeof(Task))
                         {
-                            await (Task)invocation.ReturnValue;
-                            _unitOfWork.Commit();
+                            try
+                            {
+                                await (Task)invocation.ReturnValue;
+                                _unitOfWork.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                _unitOfWork.Rollback();
+                                throw ex;
+                            }
+                            finally
+                            {
+                                _unitOfWork.Dispose();
+                            }
                         }
                         else
                         {
@@ -50,11 +65,18 @@ namespace Admin.Core.Aop
                                 {
                                     _unitOfWork.Rollback();
                                 }
-                                _unitOfWork.Commit();
+                                else
+                                {
+                                    _unitOfWork.Commit();
+                                }
                             },
                             ex =>
                             {
                                 _unitOfWork.Rollback();
+                            },
+                            ()=>
+                            {
+                                _unitOfWork.Dispose();
                             });
                         }
                     }
@@ -67,6 +89,13 @@ namespace Admin.Core.Aop
                             {
                                 _unitOfWork.Rollback();
                             }
+                            else
+                            {
+                                _unitOfWork.Commit();
+                            }
+                        }
+                        else
+                        {
                             _unitOfWork.Commit();
                         }
                     }
