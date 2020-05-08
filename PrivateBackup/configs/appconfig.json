@@ -1,0 +1,11 @@
+{
+  //Swagger文档
+  "swagger": false,
+  //Api地址
+  "urls": "http://*:8081",
+  //面向切面编程
+  "aop": {
+    //事物
+    "transaction": false
+  }
+}
