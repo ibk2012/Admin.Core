@@ -45,6 +45,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Admin.Core.Common.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Admin.Core.Model.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
