@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Admin.Core.Common.Configs;
 using Admin.Core.Common.Attributes;
 using System.Linq;
-using Google.Protobuf.WellKnownTypes;
+using Admin.Core.Common.Extensions;
 
 namespace Admin.Core.Common.Auth
 {
@@ -21,12 +21,12 @@ namespace Admin.Core.Common.Auth
             _jwtConfig = jwtConfig;
         }
 
-        public string Build(Claim[] claims)
+        public string Create(Claim[] claims)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfig.SecurityKey));
             var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var refreshExpires = DateTime.Now.AddMinutes(_jwtConfig.RefreshExpires).ToString();
-             claims = claims.Append(new Claim(ClaimAttributes.RefreshExpires, refreshExpires)).ToArray();
+            var timestamp = DateTime.Now.AddMinutes(_jwtConfig.Expires + _jwtConfig.RefreshExpires).ToTimestamp().ToString();
+             claims = claims.Append(new Claim(ClaimAttributes.RefreshExpires, timestamp)).ToArray();
 
             var token = new JwtSecurityToken(
                 issuer: _jwtConfig.Issuer,
