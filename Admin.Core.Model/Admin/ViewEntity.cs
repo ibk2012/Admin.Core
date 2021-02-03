@@ -8,9 +8,15 @@ namespace Admin.Core.Model.Admin
     /// 视图管理
     /// </summary>
 	[Table(Name = "ad_view")]
-    [Index("uk_view_parentid_label", nameof(ParentId) + "," + nameof(Label), true)]
-    public class ViewEntity : EntityBase
+    [Index("idx_{tablename}_01", nameof(ParentId) + "," + nameof(Label), true)]
+    public class ViewEntity : EntityFull, ITenant
     {
+        /// <summary>
+        /// 租户Id
+        /// </summary>
+        [Column(Position = -10, CanUpdate = false)]
+        public long? TenantId { get; set; }
+
         /// <summary>
         /// 所属节点
         /// </summary>

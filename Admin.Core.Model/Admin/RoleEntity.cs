@@ -9,9 +9,15 @@ namespace Admin.Core.Model.Admin
     /// 角色
     /// </summary>
 	[Table(Name = "ad_role")]
-    [Index("uk_role_name", nameof(Name), true)]
-    public class RoleEntity: EntityBase
+    [Index("idx_{tablename}_01", nameof(Name), true)]
+    public class RoleEntity: EntityFull, ITenant
     {
+        /// <summary>
+        /// 租户Id
+        /// </summary>
+        [Column(Position = -10, CanUpdate = false)]
+        public long? TenantId { get; set; }
+
         /// <summary>
         /// 名称
         /// </summary>

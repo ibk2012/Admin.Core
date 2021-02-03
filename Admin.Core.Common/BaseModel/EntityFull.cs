@@ -6,9 +6,9 @@ using FreeSql.DataAnnotations;
 namespace Admin.Core.Common.BaseModel
 {
     /// <summary>
-    /// 实体审计
+    /// 实体完整类
     /// </summary>
-    public class EntityBase<TKey> : Entity<TKey>, IEntityVersion, IEntitySoftDelete, IEntityAdd<TKey>, IEntityUpdate<TKey> where TKey : struct
+    public class EntityFull<TKey> : Entity<TKey>, IEntityVersion, IEntitySoftDelete, IEntityAdd<TKey>, IEntityUpdate<TKey> where TKey : struct
     {
         /// <summary>
         /// 版本
@@ -29,7 +29,7 @@ namespace Admin.Core.Common.BaseModel
         /// </summary>
         [Description("创建者Id")]
         [Column(Position = -7, CanUpdate = false)]
-        public TKey? CreatedUserId { get; set; }
+        public long? CreatedUserId { get; set; }
 
         /// <summary>
         /// 创建者
@@ -50,7 +50,7 @@ namespace Admin.Core.Common.BaseModel
         /// </summary>
         [Description("修改者Id")]
         [Column(Position = -4, CanInsert = false)]
-        public TKey? ModifiedUserId { get; set; }
+        public long? ModifiedUserId { get; set; }
 
         /// <summary>
         /// 修改者
@@ -67,7 +67,10 @@ namespace Admin.Core.Common.BaseModel
         public DateTime? ModifiedTime { get; set; }
     }
 
-    public class EntityBase : EntityBase<long>
+    /// <summary>
+    /// 实体完整类
+    /// </summary>
+    public class EntityFull : EntityFull<long>
     {
 
     }

@@ -10,6 +10,9 @@ using FreeSql.DataAnnotations;
 using Admin.Core.Common.Configs;
 using Admin.Core.Common.Helpers;
 using Admin.Core.Model.Admin;
+using System.Collections.Generic;
+using System.Reflection;
+using Admin.Core.Common.BaseModel;
 
 namespace Admin.Core.Db
 {
@@ -20,7 +23,7 @@ namespace Admin.Core.Db
         /// </summary>
         /// <param name="dbConfig"></param>
         /// <returns></returns>
-        public async static Task CreateDatabase(DbConfig dbConfig)
+        public async static Task CreateDatabaseAsync(DbConfig dbConfig)
         {
             if (!dbConfig.CreateDb || dbConfig.Type == DataType.Sqlite)
             {
@@ -33,57 +36,97 @@ namespace Admin.Core.Db
 
             try
             {
-                Console.WriteLine("\r\ncreate database started");
+                Console.WriteLine("\r\n create database started");
                 await db.Ado.ExecuteNonQueryAsync(dbConfig.CreateDbSql);
-                Console.WriteLine("create database succeed\r\n");
+                Console.WriteLine(" create database succeed");
             }
             catch (Exception e)
             {
-                Console.WriteLine($"create database failed.\n{e.Message}\r\n");
+                Console.WriteLine($" create database failed.\n {e.Message}");
             }
+        }
+
+        /// <summary>
+        /// 获得指定程序集表实体
+        /// </summary>
+        /// <returns></returns>
+        public static Type[] GetEntityTypes()
+        {
+            List<string> assemblyNames = new List<string>()
+            {
+                "Admin.Core.Model"
+            };
+
+            List<Type> entityTypes = new List<Type>();
+
+            foreach (var assemblyName in assemblyNames)
+            {
+                foreach (Type type in Assembly.Load(assemblyName).GetExportedTypes())
+                {
+                    foreach (Attribute attribute in type.GetCustomAttributes())
+                    {
+                        if (attribute is TableAttribute tableAttribute)
+                        {
+                            if (tableAttribute.DisableSyncStructure == false)
+                            {
+                                entityTypes.Add(type);
+                            }
+                        }
+                    }
+                }
+            }
+           
+            return entityTypes.ToArray();
         }
 
         /// <summary>
         /// 同步结构
         /// </summary>
-        public static void SyncStructure(IFreeSql db, string msg = null, DbConfig dbConfig = null)
+        public static void SyncStructure(IFreeSql db, string msg = null, DbConfig dbConfig = null, AppConfig appConfig = null)
         {
             //打印结构比对脚本
             //var dDL = db.CodeFirst.GetComparisonDDLStatements<PermissionEntity>();
-            //Console.WriteLine("\r\n" + dDL);
+            //Console.WriteLine("\r\n " + dDL);
 
             //打印结构同步脚本
             //db.Aop.SyncStructureAfter += (s, e) =>
             //{
             //    if (e.Sql.NotNull())
             //    {
-            //        Console.WriteLine("sync structure sql:\n" + e.Sql);
+            //        Console.WriteLine(" sync structure sql:\n" + e.Sql);
             //    }
             //};
 
             // 同步结构
             var dbType = dbConfig.Type.ToString();
-            Console.WriteLine($"{(msg.NotNull() ? msg : $"sync {dbType} structure")} started");
+            Console.WriteLine($"\r\n {(msg.NotNull() ? msg : $"sync {dbType} structure")} started");
             if(dbConfig.Type == DataType.Oracle)
             {
                 db.CodeFirst.IsSyncStructureToUpper = true;
             }
-            db.CodeFirst.SyncStructure(new Type[]
+
+            //获得指定程序集表实体
+            var entityTypes = GetEntityTypes();
+
+            //非共享数据库实体配置,不生成租户Id
+            if(appConfig.TenantType != TenantType.Share)
             {
-                typeof(DictionaryEntity),
-                typeof(ApiEntity),
-                typeof(ViewEntity),
-                typeof(PermissionEntity),
-                typeof(UserEntity),
-                typeof(RoleEntity),
-                typeof(UserRoleEntity),
-                typeof(RolePermissionEntity),
-                typeof(OprationLogEntity),
-                typeof(LoginLogEntity),
-                typeof(DocumentEntity),
-                typeof(DocumentImageEntity)
-            });
-            Console.WriteLine($"{(msg.NotNull() ? msg : $"sync {dbType} structure")} succeed\r\n");
+                var iTenant = nameof(ITenant);
+                var tenantId = nameof(ITenant.TenantId);
+                foreach (var entityType in entityTypes)
+                {
+                    if(entityType.GetInterfaces().Any(a=> a.Name == iTenant))
+                    {
+                        db.CodeFirst.Entity(entityType, a =>
+                        {
+                            a.Ignore(tenantId);
+                        });
+                    }
+                }
+            }
+
+            db.CodeFirst.SyncStructure(entityTypes);
+            Console.WriteLine($" {(msg.NotNull() ? msg : $"sync {dbType} structure")} succeed");
         }
 
         /// <summary>
@@ -95,7 +138,7 @@ namespace Admin.Core.Db
         /// <param name="tran"></param>
         /// <param name="dbConfig"></param>
         /// <returns></returns>
-        private static async Task InitDtData<T>(
+        private static async Task InitDtDataAsync<T>(
             IFreeSql db, 
             T[] data, 
             System.Data.Common.DbTransaction tran, 
@@ -128,21 +171,21 @@ namespace Admin.Core.Db
                             await insert.AppendData(data).InsertIdentity().ExecuteAffrowsAsync();
                         }
                         
-                        Console.WriteLine($"table: {tableName} sync data succeed");
+                        Console.WriteLine($" table: {tableName} sync data succeed");
                     }
                     else
                     {
-                        Console.WriteLine($"table: {tableName} import data []");
+                        Console.WriteLine($" table: {tableName} import data []");
                     }
                 }
                 else
                 {
-                    Console.WriteLine($"table: {tableName} record already exists");
+                    Console.WriteLine($" table: {tableName} record already exists");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"table: {tableName} sync data failed.\n{ex.Message}");
+                Console.WriteLine($" table: {tableName} sync data failed.\n{ex.Message}");
             }
         }
 
@@ -183,7 +226,7 @@ namespace Admin.Core.Db
         /// 同步数据
         /// </summary>
         /// <returns></returns>
-        public static async Task SyncData(IFreeSql db, DbConfig dbConfig = null)
+        public static async Task SyncDataAsync(IFreeSql db, DbConfig dbConfig = null)
         {
             try
             {
@@ -192,7 +235,7 @@ namespace Admin.Core.Db
                 //    Console.WriteLine($"{e.Sql}\r\n");
                 //};
 
-                Console.WriteLine("sync data started");
+                Console.WriteLine("\r\n sync data started");
 
                 db.Aop.AuditValue += SyncDataAuditValue;
                
@@ -203,25 +246,26 @@ namespace Admin.Core.Db
                 using (var uow = db.CreateUnitOfWork())
                 using (var tran = uow.GetOrBeginTransaction())
                 {
-                    await InitDtData(db, data.Dictionaries, tran, dbConfig);
-                    await InitDtData(db, data.Apis, tran, dbConfig);
-                    await InitDtData(db, data.Views, tran, dbConfig);
-                    await InitDtData(db, data.Permissions, tran, dbConfig);
-                    await InitDtData(db, data.Users, tran, dbConfig);
-                    await InitDtData(db, data.Roles, tran, dbConfig);
-                    await InitDtData(db, data.UserRoles, tran, dbConfig);
-                    await InitDtData(db, data.RolePermissions, tran, dbConfig);
+                    await InitDtDataAsync(db, data.Dictionaries, tran, dbConfig);
+                    await InitDtDataAsync(db, data.Apis, tran, dbConfig);
+                    await InitDtDataAsync(db, data.Views, tran, dbConfig);
+                    await InitDtDataAsync(db, data.Permissions, tran, dbConfig);
+                    await InitDtDataAsync(db, data.Users, tran, dbConfig);
+                    await InitDtDataAsync(db, data.Roles, tran, dbConfig);
+                    await InitDtDataAsync(db, data.UserRoles, tran, dbConfig);
+                    await InitDtDataAsync(db, data.RolePermissions, tran, dbConfig);
+                    await InitDtDataAsync(db, data.Tenants, tran, dbConfig);
 
                     uow.Commit();
                 }
 
                 db.Aop.AuditValue -= SyncDataAuditValue;
 
-                Console.WriteLine("sync data succeed\r\n");
+                Console.WriteLine(" sync data succeed");
             }
             catch (Exception ex)
             {
-                throw new Exception($"sync data failed.\n{ex.Message}\r\n");
+                throw new Exception($" sync data failed.\n{ex.Message}");
             }
         }
 
@@ -230,11 +274,11 @@ namespace Admin.Core.Db
         /// </summary>
         /// <param name="db"></param>
         /// <returns></returns>
-        public static async Task GenerateSimpleJsonData(IFreeSql db)
+        public static async Task GenerateSimpleJsonDataAsync(IFreeSql db)
         {
             try
             {
-                Console.WriteLine("\r\ngenerate data started");
+                Console.WriteLine("\r\n generate data started");
 
                 #region 数据表
 
@@ -340,9 +384,22 @@ namespace Admin.Core.Db
                 });
                 #endregion
 
+                #region 租户
+                var tenants = await db.Queryable<TenantEntity>().ToListAsync(a => new
+                {
+                    a.Id,
+                    a.Name,
+                    a.Code,
+                    a.DbType,
+                    a.ConnectionString,
+                    a.IdleTime,
+                    a.Description
+                });
                 #endregion
 
-                if(!(users?.Count > 0))
+                #endregion
+
+                if (!(users?.Count > 0))
                 {
                     return;
                 }
@@ -361,7 +418,8 @@ namespace Admin.Core.Db
                     users,
                     roles,
                     userRoles,
-                    rolePermissions
+                    rolePermissions,
+                    tenants
                 },
                 //Formatting.Indented, 
                 settings
@@ -370,11 +428,11 @@ namespace Admin.Core.Db
                 FileHelper.WriteFile(filePath, jsonData);
                 #endregion
 
-                Console.WriteLine("generate data succeed\r\n");
+                Console.WriteLine(" generate data succeed\r\n");
             }
             catch (Exception ex)
             {
-                throw new Exception($"generate data failed。\n{ex.Message}\r\n");
+                throw new Exception($" generate data failed。\n{ex.Message}\r\n");
             }
         }
     }

@@ -6,25 +6,25 @@ using FreeSql;
 using Admin.Core.Common.Configs;
 using Admin.Core.Common.Helpers;
 using Admin.Core.Common.Auth;
-using Admin.Core.Common.BaseModel;
+using Admin.Core.Common.Dbs;
 
 namespace Admin.Core.Db
 {
-    public static class ServiceCollectionExtensions
+    public static class DBServiceCollectionExtensions
     {
         /// <summary>
         /// 添加数据库
         /// </summary>
         /// <param name="services"></param>
         /// <param name="env"></param>
-        public async static Task AddDb(this IServiceCollection services, IHostEnvironment env)
+        public async static Task AddDbAsync(this IServiceCollection services, IHostEnvironment env)
         {
             var dbConfig = new ConfigHelper().Get<DbConfig>("dbconfig", env.EnvironmentName);
 
             //创建数据库
             if (dbConfig.CreateDb)
             {
-                await DbHelper.CreateDatabase(dbConfig);
+                await DbHelper.CreateDatabaseAsync(dbConfig);
             }
 
             #region FreeSql
@@ -46,29 +46,26 @@ namespace Admin.Core.Db
             #endregion
 
             var fsql = freeSqlBuilder.Build();
-            //fsql.GlobalFilter.Apply<IEntitySoftDelete>("SoftDelete", a => a.IsDeleted == false);
-            services.AddFreeRepository(filter => filter.Apply<IEntitySoftDelete>("SoftDelete", a => a.IsDeleted == false));
-            services.AddScoped<UnitOfWorkManager>();
-            services.AddSingleton(fsql);
 
             #region 初始化数据库
             //同步结构
             if (dbConfig.SyncStructure)
             {
-                DbHelper.SyncStructure(fsql, dbConfig: dbConfig);
+                var appConfig = new ConfigHelper().Get<AppConfig>("appconfig", env.EnvironmentName);
+                DbHelper.SyncStructure(fsql, dbConfig: dbConfig, appConfig: appConfig);
             }
 
             //同步数据
             if (dbConfig.SyncData)
             {
-                await DbHelper.SyncData(fsql, dbConfig);
+                await DbHelper.SyncDataAsync(fsql, dbConfig);
             }
             #endregion
 
             //生成数据包
             if (dbConfig.GenerateData && !dbConfig.CreateDb && !dbConfig.SyncData)
             {
-                await DbHelper.GenerateSimpleJsonData(fsql);
+                await DbHelper.GenerateSimpleJsonDataAsync(fsql);
             }
 
             #region 监听Curd操作
@@ -103,6 +100,9 @@ namespace Admin.Core.Db
                         case "CreatedUserName":
                             e.Value = user.Name;
                             break;
+                        case "TenantId":
+                            e.Value = user.TenantId;
+                            break;
                             //case "CreatedTime":
                             //    e.Value = DateTime.Now.Subtract(timeOffset);
                             //    break;
@@ -126,6 +126,38 @@ namespace Admin.Core.Db
             };
             #endregion
             #endregion
+
+            //导入多数据库
+            if(null != dbConfig.Dbs)
+            {
+                foreach (var multiDb in dbConfig.Dbs)
+                {
+
+                    switch (multiDb.Name)
+                    {
+                        case nameof(MySqlDb):
+                            var mdb = CreateMultiDbBuilder(multiDb).Build<MySqlDb>();
+                            services.AddSingleton(mdb);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 创建多数据库构建器
+        /// </summary>
+        /// <param name="multiDb"></param>
+        /// <returns></returns>
+        private static FreeSqlBuilder CreateMultiDbBuilder(MultiDb multiDb)
+        {
+            return new FreeSqlBuilder()
+            .UseConnectionString(multiDb.Type, multiDb.ConnectionString)
+            .UseAutoSyncStructure(false)
+            .UseLazyLoading(false)
+            .UseNoneCommandParameter(true);
         }
     }
 }

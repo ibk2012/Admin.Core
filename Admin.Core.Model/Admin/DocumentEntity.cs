@@ -7,9 +7,15 @@ namespace Admin.Core.Model.Admin
     /// 文档
     /// </summary>
 	[Table(Name = "ad_document")]
-    [Index("uk_document_parentid_label", nameof(ParentId) + "," + nameof(Label), true)]
-    public class DocumentEntity : EntityBase
+    [Index("idx_{tablename}_01", nameof(ParentId) + "," + nameof(Label), true)]
+    public class DocumentEntity : EntityFull, ITenant
     {
+        /// <summary>
+        /// 租户Id
+        /// </summary>
+        [Column(Position = -10, CanUpdate = false)]
+        public long? TenantId { get; set; }
+
         /// <summary>
         /// 父级节点
         /// </summary>

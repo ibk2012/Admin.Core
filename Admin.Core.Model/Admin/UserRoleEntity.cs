@@ -7,9 +7,15 @@ namespace Admin.Core.Model.Admin
     /// 用户角色
     /// </summary>
 	[Table(Name = "ad_user_role")]
-    [Index("uk_user_role_userid_roleid", nameof(UserId) + "," + nameof(RoleId), true)]
-    public class UserRoleEntity: EntityAdd
+    [Index("idx_{tablename}_01", nameof(UserId) + "," + nameof(RoleId), true)]
+    public class UserRoleEntity: EntityAdd, ITenant
     {
+        /// <summary>
+        /// 租户Id
+        /// </summary>
+        [Column(Position = -10, CanUpdate = false)]
+        public long? TenantId { get; set; }
+
         /// <summary>
         /// 用户Id
         /// </summary>

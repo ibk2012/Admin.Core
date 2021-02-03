@@ -36,6 +36,7 @@ using Admin.Core.Common.Attributes;
 using Admin.Core.Common.Auth;
 using AspNetCoreRateLimit;
 using IdentityServer4.AccessTokenValidation;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Admin.Core
 {
@@ -57,6 +58,11 @@ namespace Admin.Core
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IPermissionHandler, PermissionHandler>();
+
+            // ClaimType不被更改
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
             //用户信息
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             if (_appConfig.IdentityServer.Enable)
@@ -71,7 +77,9 @@ namespace Admin.Core
             }
 
             //数据库
-            services.AddDb(_env).Wait();
+            services.AddDbAsync(_env).Wait();
+            //租户分库
+            services.AddTenantDb(_env);
 
             //应用配置
             services.AddSingleton(_appConfig);
@@ -125,14 +133,12 @@ namespace Admin.Core
                     options.DefaultChallengeScheme = nameof(ResponseAuthenticationHandler); //401
                     options.DefaultForbidScheme = nameof(ResponseAuthenticationHandler);    //403
                 })
-                .AddIdentityServerAuthentication(options =>
-                 {
-                     options.Authority = _appConfig.IdentityServer.Url;
-                     options.RequireHttpsMetadata = false;
-                     options.SupportedTokens = SupportedTokens.Jwt;
-                     options.ApiName = "admin.server.api";
-                     options.ApiSecret = "secret";
-                 })
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = _appConfig.IdentityServer.Url;
+                    options.RequireHttpsMetadata = false;
+                    options.Audience = "admin.server.api";
+                })
                 .AddScheme<AuthenticationSchemeOptions, ResponseAuthenticationHandler>(nameof(ResponseAuthenticationHandler), o => { });
             }
             else
@@ -260,7 +266,8 @@ namespace Admin.Core
             #region 操作日志
             if (_appConfig.Log.Operation)
             {
-                services.AddSingleton<ILogHandler, LogHandler>();
+                //services.AddSingleton<ILogHandler, LogHandler>();
+                services.AddScoped<ILogHandler, LogHandler>();
             }
             #endregion
 
