@@ -80,6 +80,33 @@ namespace Admin.Core.Db
         }
 
         /// <summary>
+        /// 配置实体
+        /// </summary>
+        public static void ConfigEntity(IFreeSql db, AppConfig appConfig = null)
+        {
+            //非共享数据库实体配置,不生成和操作租户Id
+            if (appConfig.TenantType != TenantType.Share)
+            {
+                var iTenant = nameof(ITenant);
+                var tenantId = nameof(ITenant.TenantId);
+
+                //获得指定程序集表实体
+                var entityTypes = GetEntityTypes();
+
+                foreach (var entityType in entityTypes)
+                {
+                    if (entityType.GetInterfaces().Any(a => a.Name == iTenant))
+                    {
+                        db.CodeFirst.Entity(entityType, a =>
+                        {
+                            a.Ignore(tenantId);
+                        });
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// 同步结构
         /// </summary>
         public static void SyncStructure(IFreeSql db, string msg = null, DbConfig dbConfig = null, AppConfig appConfig = null)
@@ -108,25 +135,29 @@ namespace Admin.Core.Db
             //获得指定程序集表实体
             var entityTypes = GetEntityTypes();
 
-            //非共享数据库实体配置,不生成租户Id
-            if(appConfig.TenantType != TenantType.Share)
+            db.CodeFirst.SyncStructure(entityTypes);
+            Console.WriteLine($" {(msg.NotNull() ? msg : $"sync {dbType} structure")} succeed");
+        }
+
+        /// <summary>
+        /// 检查实体属性是否为自增长
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        private static bool CheckIdentity<T>() where T : class
+        {
+            var isIdentity = false;
+            var properties = typeof(T).GetProperties();
+            foreach (var property in properties)
             {
-                var iTenant = nameof(ITenant);
-                var tenantId = nameof(ITenant.TenantId);
-                foreach (var entityType in entityTypes)
+                if (property.GetCustomAttributes(typeof(ColumnAttribute), false).FirstOrDefault() is ColumnAttribute columnAttribute && columnAttribute.IsIdentity)
                 {
-                    if(entityType.GetInterfaces().Any(a=> a.Name == iTenant))
-                    {
-                        db.CodeFirst.Entity(entityType, a =>
-                        {
-                            a.Ignore(tenantId);
-                        });
-                    }
+                    isIdentity = true;
+                    break;
                 }
             }
 
-            db.CodeFirst.SyncStructure(entityTypes);
-            Console.WriteLine($" {(msg.NotNull() ? msg : $"sync {dbType} structure")} succeed");
+            return isIdentity;
         }
 
         /// <summary>
@@ -161,16 +192,25 @@ namespace Admin.Core.Db
                             insert = insert.WithTransaction(tran);
                         }
 
-                        if(dbConfig.Type == DataType.SqlServer)
+                        var isIdentity = CheckIdentity<T>();
+                        if (isIdentity)
                         {
-                            var insrtSql = insert.AppendData(data).InsertIdentity().ToSql();
-                            await db.Ado.ExecuteNonQueryAsync($"SET IDENTITY_INSERT {tableName} ON\n {insrtSql} \nSET IDENTITY_INSERT {tableName} OFF");
+                            if (dbConfig.Type == DataType.SqlServer)
+                            {
+
+                                var insrtSql = insert.AppendData(data).InsertIdentity().ToSql();
+                                await db.Ado.ExecuteNonQueryAsync($"SET IDENTITY_INSERT {tableName} ON\n {insrtSql} \nSET IDENTITY_INSERT {tableName} OFF");
+                            }
+                            else
+                            {
+                                await insert.AppendData(data).InsertIdentity().ExecuteAffrowsAsync();
+                            }
                         }
                         else
                         {
-                            await insert.AppendData(data).InsertIdentity().ExecuteAffrowsAsync();
+                            await insert.AppendData(data).ExecuteAffrowsAsync();
                         }
-                        
+
                         Console.WriteLine($" table: {tableName} sync data succeed");
                     }
                     else

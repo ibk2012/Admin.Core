@@ -7,6 +7,7 @@ using Admin.Core.Common.Helpers;
 using Admin.Core.Common.Auth;
 using Admin.Core.Common.BaseModel;
 using Admin.Core.Repository;
+using Admin.Core.Common.Consts;
 
 namespace Admin.Core.Db
 {
@@ -34,7 +35,12 @@ namespace Admin.Core.Db
 
             IdleBus <IFreeSql> ib = new IdleBus<IFreeSql>(TimeSpan.FromMinutes(idleTime));
 
-            ib.TryRegister("tenant_" + user.TenantId.ToString(), () =>
+            var tenantName = AdminConsts.TenantName;
+            if(appConfig.TenantType == TenantType.Own)
+            {
+                tenantName = "tenant_" + user.TenantId.ToString();
+            }
+            ib.TryRegister(tenantName, () =>
             {
                 #region FreeSql
                 var freeSqlBuilder = new FreeSqlBuilder()
@@ -54,8 +60,12 @@ namespace Admin.Core.Db
 
                 var fsql = freeSqlBuilder.Build();
                 fsql.GlobalFilter.Apply<IEntitySoftDelete>("SoftDelete", a => a.IsDeleted == false);
+                
+                //配置实体
+                DbHelper.ConfigEntity(fsql, appConfig);
+
                 //共享数据库
-                if(appConfig.TenantType == TenantType.Share)
+                if (appConfig.TenantType == TenantType.Share)
                 {
                     fsql.GlobalFilter.ApplyIf<ITenant>("Tenant", () => user.TenantId > 0, a => a.TenantId == user.TenantId);
                 }
