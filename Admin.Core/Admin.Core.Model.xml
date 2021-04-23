@@ -9,6 +9,11 @@
             接口管理
             </summary>
         </member>
+        <member name="P:Admin.Core.Model.Admin.ApiEntity.TenantId">
+            <summary>
+            租户Id
+            </summary>
+        </member>
         <member name="P:Admin.Core.Model.Admin.ApiEntity.ParentId">
             <summary>
             所属模块
@@ -54,6 +59,11 @@
             数据字典
             </summary>
         </member>
+        <member name="P:Admin.Core.Model.Admin.DictionaryEntity.TenantId">
+            <summary>
+            租户Id
+            </summary>
+        </member>
         <member name="P:Admin.Core.Model.Admin.DictionaryEntity.ParentId">
             <summary>
             字典父级
@@ -92,6 +102,11 @@
         <member name="T:Admin.Core.Model.Admin.DocumentEntity">
             <summary>
             文档
+            </summary>
+        </member>
+        <member name="P:Admin.Core.Model.Admin.DocumentEntity.TenantId">
+            <summary>
+            租户Id
             </summary>
         </member>
         <member name="P:Admin.Core.Model.Admin.DocumentEntity.ParentId">
@@ -149,6 +164,11 @@
             文档图片
             </summary>
         </member>
+        <member name="P:Admin.Core.Model.Admin.DocumentImageEntity.TenantId">
+            <summary>
+            租户Id
+            </summary>
+        </member>
         <member name="P:Admin.Core.Model.Admin.DocumentImageEntity.DocumentId">
             <summary>
             用户Id
@@ -177,6 +197,11 @@
         <member name="T:Admin.Core.Model.Admin.LogAbstract">
             <summary>
             日志
+            </summary>
+        </member>
+        <member name="P:Admin.Core.Model.Admin.LogAbstract.TenantId">
+            <summary>
+            租户Id
             </summary>
         </member>
         <member name="P:Admin.Core.Model.Admin.LogAbstract.NickName">
@@ -264,6 +289,11 @@
             权限
             </summary>
         </member>
+        <member name="P:Admin.Core.Model.Admin.PermissionEntity.TenantId">
+            <summary>
+            租户Id
+            </summary>
+        </member>
         <member name="P:Admin.Core.Model.Admin.PermissionEntity.ParentId">
             <summary>
             父级节点
@@ -272,6 +302,11 @@
         <member name="P:Admin.Core.Model.Admin.PermissionEntity.Label">
             <summary>
             权限名称
+            </summary>
+        </member>
+        <member name="P:Admin.Core.Model.Admin.PermissionEntity.Code">
+            <summary>
+            权限编码
             </summary>
         </member>
         <member name="P:Admin.Core.Model.Admin.PermissionEntity.Type">
@@ -359,9 +394,19 @@
             接口
             </summary>
         </member>
+        <member name="F:Admin.Core.Model.Admin.PermissionType.Dot">
+            <summary>
+            权限点
+            </summary>
+        </member>
         <member name="T:Admin.Core.Model.Admin.RoleEntity">
             <summary>
             角色
+            </summary>
+        </member>
+        <member name="P:Admin.Core.Model.Admin.RoleEntity.TenantId">
+            <summary>
+            租户Id
             </summary>
         </member>
         <member name="P:Admin.Core.Model.Admin.RoleEntity.Name">
@@ -389,6 +434,11 @@
             角色权限
             </summary>
         </member>
+        <member name="P:Admin.Core.Model.Admin.RolePermissionEntity.TenantId">
+            <summary>
+            租户Id
+            </summary>
+        </member>
         <member name="P:Admin.Core.Model.Admin.RolePermissionEntity.RoleId">
             <summary>
             角色Id
@@ -409,9 +459,59 @@
             权限
             </summary>
         </member>
+        <member name="T:Admin.Core.Model.Admin.TenantEntity">
+            <summary>
+            租户
+            </summary>
+        </member>
+        <member name="P:Admin.Core.Model.Admin.TenantEntity.TenantId">
+            <summary>
+            租户Id
+            </summary>
+        </member>
+        <member name="P:Admin.Core.Model.Admin.TenantEntity.Code">
+            <summary>
+            编码
+            </summary>
+        </member>
+        <member name="P:Admin.Core.Model.Admin.TenantEntity.Name">
+            <summary>
+            名称
+            </summary>
+        </member>
+        <member name="P:Admin.Core.Model.Admin.TenantEntity.DbType">
+            <summary>
+            数据库
+            </summary>
+        </member>
+        <member name="P:Admin.Core.Model.Admin.TenantEntity.ConnectionString">
+            <summary>
+            连接字符串
+            </summary>
+        </member>
+        <member name="P:Admin.Core.Model.Admin.TenantEntity.IdleTime">
+            <summary>
+            空闲时间(分)
+            </summary>
+        </member>
+        <member name="P:Admin.Core.Model.Admin.TenantEntity.Enabled">
+            <summary>
+            启用
+            </summary>
+        </member>
+        <member name="P:Admin.Core.Model.Admin.TenantEntity.Description">
+            <summary>
+            说明
+            </summary>
+        </member>
         <member name="T:Admin.Core.Model.Admin.UserEntity">
             <summary>
             用户
+            </summary>
+        </member>
+        <member name="P:Admin.Core.Model.Admin.UserEntity.TenantId">
+            <summary>
+            租户Id
             </summary>
         </member>
         <member name="P:Admin.Core.Model.Admin.UserEntity.UserName">
@@ -449,6 +549,11 @@
             用户角色
             </summary>
         </member>
+        <member name="P:Admin.Core.Model.Admin.UserRoleEntity.TenantId">
+            <summary>
+            租户Id
+            </summary>
+        </member>
         <member name="P:Admin.Core.Model.Admin.UserRoleEntity.UserId">
             <summary>
             用户Id
@@ -462,6 +567,11 @@
         <member name="T:Admin.Core.Model.Admin.ViewEntity">
             <summary>
             视图管理
+            </summary>
+        </member>
+        <member name="P:Admin.Core.Model.Admin.ViewEntity.TenantId">
+            <summary>
+            租户Id
             </summary>
         </member>
         <member name="P:Admin.Core.Model.Admin.ViewEntity.ParentId">

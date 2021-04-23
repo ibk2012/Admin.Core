@@ -7,9 +7,15 @@ namespace Admin.Core.Model.Admin
     /// 权限
     /// </summary>
 	[Table(Name = "ad_permission")]
-    [Index("uk_permission_parentid_label", nameof(ParentId) + "," + nameof(Label), true)]
-    public class PermissionEntity : EntityBase
+    [Index("idx_{tablename}_01", nameof(ParentId) + "," + nameof(Label), true)]
+    public class PermissionEntity : EntityFull, ITenant
     {
+        /// <summary>
+        /// 租户Id
+        /// </summary>
+        [Column(Position = -10, CanUpdate = false)]
+        public long? TenantId { get; set; }
+
         /// <summary>
         /// 父级节点
         /// </summary>
@@ -20,6 +26,12 @@ namespace Admin.Core.Model.Admin
         /// </summary>
         [Column(StringLength = 50)]
         public string Label { get; set; }
+
+        /// <summary>
+        /// 权限编码
+        /// </summary>
+        [Column(StringLength = 550)]
+        public string Code { get; set; }
 
         /// <summary>
         /// 权限类型

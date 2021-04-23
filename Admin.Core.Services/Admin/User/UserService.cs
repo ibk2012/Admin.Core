@@ -9,12 +9,12 @@ using Admin.Core.Common.Input;
 using Admin.Core.Common.Output;
 using Admin.Core.Model.Admin;
 using Admin.Core.Repository.Admin;
-using Admin.Core.Service.Admin.User;
 using Admin.Core.Service.Admin.User.Input;
 using Admin.Core.Service.Admin.User.Output;
 using Admin.Core.Common.Attributes;
+using Admin.Core.Service.Admin.Auth.Output;
 
-namespace Admin.Core.FrameWork.Service.User
+namespace Admin.Core.Service.Admin.User
 {
     /// <summary>
     /// 用户服务
@@ -45,6 +45,13 @@ namespace Admin.Core.FrameWork.Service.User
             _rolePermissionRepository = rolePermissionRepository;
         }
 
+        public async Task<ResponseOutput<AuthLoginOutput>> GetLoginUserAsync(long id)
+        {
+            var output = new ResponseOutput<AuthLoginOutput>();
+            var entityDto = await _userRepository.GetAsync<AuthLoginOutput>(id);
+            return output.Ok(entityDto);
+        }
+
         public async Task<ResponseOutput<UserGetOutput>> GetAsync(long id)
         {
             var res = new ResponseOutput<UserGetOutput>();
@@ -69,33 +76,35 @@ namespace Admin.Core.FrameWork.Service.User
             return ResponseOutput.Ok(data);
         }
 
-        public async Task<IList<string>> GetPermissionsAsync()
+        public async Task<IList<UserPermissionsOutput>> GetPermissionsAsync()
         {
             var key = string.Format(CacheKey.UserPermissions, _user.Id);
             if (await _cache.ExistsAsync(key))
             {
-                return await _cache.GetAsync<IList<string>>(key);
+                try
+                {
+                    return await _cache.GetAsync<IList<UserPermissionsOutput>>(key);
+                }
+                catch
+                {
+                    await _cache.DelByPatternAsync("admin:user:{0}:permissions");
+                }
             }
-            else
-            {
-                var userPermissoins = await _rolePermissionRepository.Select
+
+            var userPermissoins = await _rolePermissionRepository.Select
                 .InnerJoin<UserRoleEntity>((a, b) => a.RoleId == b.RoleId && b.UserId == _user.Id && a.Permission.Type == PermissionType.Api)
                 .Include(a => a.Permission.Api)
                 .Distinct()
-                .ToListAsync(a => a.Permission.Api.Path);
+                .ToListAsync(a => new UserPermissionsOutput { HttpMethods = a.Permission.Api.HttpMethods, Path = a.Permission.Api.Path });
 
-                await _cache.SetAsync(key, userPermissoins);
+            await _cache.SetAsync(key, userPermissoins);
 
-                return userPermissoins;
-            }
+            return userPermissoins;
         }
 
         public async Task<IResponseOutput> PageAsync(PageInput<UserEntity> input)
         {
-            var key = input.Filter?.UserName;
-
             var list = await _userRepository.Select
-            .WhereIf(key.NotNull(), a => a.Status >= 0 && (a.UserName.Contains(key) || a.NickName.Contains(key)))
             .WhereDynamicFilter(input.DynamicFilter)
             .Count(out var total)
             .OrderByDescending(true, a => a.Id)

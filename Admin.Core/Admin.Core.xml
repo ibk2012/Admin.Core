@@ -133,6 +133,13 @@
             授权管理
             </summary>
         </member>
+        <member name="M:Admin.Core.Controllers.Admin.AuthController.GetToken(Admin.Core.Common.Output.ResponseOutput{Admin.Core.Service.Admin.Auth.Output.AuthLoginOutput})">
+            <summary>
+            获得token
+            </summary>
+            <param name="output"></param>
+            <returns></returns>
+        </member>
         <member name="M:Admin.Core.Controllers.Admin.AuthController.GetVerifyCode(System.String)">
             <summary>
             获取验证码
@@ -158,6 +165,14 @@
             根据登录信息生成Token
             </summary>
             <param name="input">登录信息</param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.AuthController.Refresh(System.String)">
+            <summary>
+            刷新Token
+            以旧换新
+            </summary>
+            <param name="token"></param>
             <returns></returns>
         </member>
         <member name="T:Admin.Core.Controllers.Admin.CacheController">
@@ -382,6 +397,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:Admin.Core.Controllers.Admin.PermissionController.GetDot(System.Int64)">
+            <summary>
+            查询单条权限点
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:Admin.Core.Controllers.Admin.PermissionController.GetPermissionList">
             <summary>
             查询角色权限-权限列表
@@ -416,6 +438,13 @@
             <param name="input"></param>
             <returns></returns>
         </member>
+        <member name="M:Admin.Core.Controllers.Admin.PermissionController.AddDot(Admin.Core.Service.Admin.Permission.Input.PermissionAddDotInput)">
+            <summary>
+            新增权限点
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
         <member name="M:Admin.Core.Controllers.Admin.PermissionController.UpdateGroup(Admin.Core.Service.Admin.Permission.Input.PermissionUpdateGroupInput)">
             <summary>
             修改分组
@@ -433,6 +462,13 @@
         <member name="M:Admin.Core.Controllers.Admin.PermissionController.UpdateApi(Admin.Core.Service.Admin.Permission.Input.PermissionUpdateApiInput)">
             <summary>
             修改接口
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.PermissionController.UpdateDot(Admin.Core.Service.Admin.Permission.Input.PermissionUpdateDotInput)">
+            <summary>
+            修改权限点
             </summary>
             <param name="input"></param>
             <returns></returns>
@@ -494,6 +530,53 @@
         <member name="M:Admin.Core.Controllers.Admin.RoleController.BatchSoftDelete(System.Int64[])">
             <summary>
             批量删除角色
+            </summary>
+            <param name="ids"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Admin.Core.Controllers.Admin.TenantController">
+            <summary>
+            租户管理
+            </summary>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.TenantController.Get(System.Int64)">
+            <summary>
+            查询单条租户
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.TenantController.GetPage(Admin.Core.Common.Input.PageInput{Admin.Core.Model.Admin.TenantEntity})">
+            <summary>
+            查询分页租户
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.TenantController.Add(Admin.Core.Service.Admin.Tenant.Input.TenantAddInput)">
+            <summary>
+            新增租户
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.TenantController.Update(Admin.Core.Service.Admin.Tenant.Input.TenantUpdateInput)">
+            <summary>
+            修改租户
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.TenantController.SoftDelete(System.Int64)">
+            <summary>
+            删除租户
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Controllers.Admin.TenantController.BatchSoftDelete(System.Int64[])">
+            <summary>
+            批量删除租户
             </summary>
             <param name="ids"></param>
             <returns></returns>
@@ -645,19 +728,37 @@
             数据
             </summary>
         </member>
-        <member name="M:Admin.Core.Db.DbHelper.CreateDatabase(Admin.Core.Common.Configs.DbConfig)">
+        <member name="M:Admin.Core.Db.DbHelper.CreateDatabaseAsync(Admin.Core.Common.Configs.DbConfig)">
             <summary>
             创建数据库
             </summary>
             <param name="dbConfig"></param>
             <returns></returns>
         </member>
-        <member name="M:Admin.Core.Db.DbHelper.SyncStructure(IFreeSql,System.String,Admin.Core.Common.Configs.DbConfig)">
+        <member name="M:Admin.Core.Db.DbHelper.GetEntityTypes">
+            <summary>
+            获得指定程序集表实体
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Db.DbHelper.ConfigEntity(IFreeSql,Admin.Core.Common.Configs.AppConfig)">
+            <summary>
+            配置实体
+            </summary>
+        </member>
+        <member name="M:Admin.Core.Db.DbHelper.SyncStructure(IFreeSql,System.String,Admin.Core.Common.Configs.DbConfig,Admin.Core.Common.Configs.AppConfig)">
             <summary>
             同步结构
             </summary>
         </member>
-        <member name="M:Admin.Core.Db.DbHelper.InitDtData``1(IFreeSql,``0[],System.Data.Common.DbTransaction,Admin.Core.Common.Configs.DbConfig)">
+        <member name="M:Admin.Core.Db.DbHelper.CheckIdentity``1">
+            <summary>
+            检查实体属性是否为自增长
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Db.DbHelper.InitDtDataAsync``1(IFreeSql,``0[],System.Data.Common.DbTransaction,Admin.Core.Common.Configs.DbConfig)">
             <summary>
             初始化数据表数据
             </summary>
@@ -675,26 +776,82 @@
             <param name="s"></param>
             <param name="e"></param>
         </member>
-        <member name="M:Admin.Core.Db.DbHelper.SyncData(IFreeSql,Admin.Core.Common.Configs.DbConfig)">
+        <member name="M:Admin.Core.Db.DbHelper.SyncDataAsync(IFreeSql,Admin.Core.Common.Configs.DbConfig)">
             <summary>
             同步数据
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Admin.Core.Db.DbHelper.GenerateSimpleJsonData(IFreeSql)">
+        <member name="M:Admin.Core.Db.DbHelper.GenerateSimpleJsonDataAsync(IFreeSql)">
             <summary>
             生成极简数据
             </summary>
             <param name="db"></param>
             <returns></returns>
         </member>
-        <member name="M:Admin.Core.Db.ServiceCollectionExtensions.AddDb(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Hosting.IHostEnvironment,Admin.Core.Common.Configs.AppConfig)">
+        <member name="M:Admin.Core.Db.DBServiceCollectionExtensions.AddDbAsync(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Hosting.IHostEnvironment)">
             <summary>
             添加数据库
             </summary>
             <param name="services"></param>
             <param name="env"></param>
-            <param name="appConfig"></param>
+        </member>
+        <member name="M:Admin.Core.Db.DBServiceCollectionExtensions.CreateMultiDbBuilder(Admin.Core.Common.Configs.MultiDb)">
+            <summary>
+            创建多数据库构建器
+            </summary>
+            <param name="multiDb"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Db.TenantDbHelper.CreateDatabase(Admin.Core.Common.Configs.DbConfig)">
+            <summary>
+            创建数据库
+            </summary>
+            <param name="dbConfig"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Db.TenantDbHelper.SyncStructure(IFreeSql,System.String,Admin.Core.Common.Configs.DbConfig)">
+            <summary>
+            同步结构
+            </summary>
+        </member>
+        <member name="M:Admin.Core.Db.TenantDbHelper.InitDtData``1(IFreeSql,``0[],System.Data.Common.DbTransaction,Admin.Core.Common.Configs.DbConfig)">
+            <summary>
+            初始化数据表数据
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="db"></param>
+            <param name="data"></param>
+            <param name="tran"></param>
+            <param name="dbConfig"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Db.TenantDbHelper.SyncDataAuditValue(System.Object,FreeSql.Aop.AuditValueEventArgs)">
+            <summary>
+            同步数据审计方法
+            </summary>
+            <param name="s"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:Admin.Core.Db.TenantDbHelper.SyncData(IFreeSql,Admin.Core.Common.Configs.DbConfig)">
+            <summary>
+            同步数据
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Db.TenantDbHelper.GenerateSimpleJsonData(IFreeSql)">
+            <summary>
+            生成极简数据
+            </summary>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Admin.Core.Db.TenantDBServiceCollectionExtensions.AddTenantDb(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Hosting.IHostEnvironment)">
+            <summary>
+            添加租户数据库
+            </summary>
+            <param name="services"></param>
+            <param name="env"></param>
         </member>
         <member name="T:Admin.Core.Enums.ApiVersion">
             <summary>
@@ -745,6 +902,14 @@
             <summary>
             系统内部错误（非业务代码里显式抛出的异常，例如由于数据不正确导致空指针异常、数据库异常等等）
             </summary>
+        </member>
+        <member name="M:Admin.Core.Extensions.RateLimitServiceCollectionExtensions.AddIpRateLimit(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration,Admin.Core.Common.Configs.CacheConfig)">
+            <summary>
+            添加Ip限流
+            </summary>
+            <param name="services"></param>
+            <param name="configuration"></param>
+            <param name="cacheConfig"></param>
         </member>
         <member name="T:Admin.Core.Filters.AdminExceptionFilter">
             <summary>

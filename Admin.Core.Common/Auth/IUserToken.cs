@@ -4,6 +4,8 @@ namespace Admin.Core.Common.Auth
 {
     public interface IUserToken
     {
-        string Build(Claim[] claims);
+        string Create(Claim[] claims);
+
+        Claim[] Decode(string jwtToken);
     }
 }
